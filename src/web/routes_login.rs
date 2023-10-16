@@ -1,11 +1,11 @@
-use crate::ctx::Ctx;
-use crate::model::user::{UserBmc, UserForLogin};
-use crate::model::ModelManager;
-use crate::pwd::{self, ContentToHash};
 use crate::web::{self, remove_token_cookie, Error, Result};
 use axum::extract::State;
 use axum::routing::post;
 use axum::{Json, Router};
+use lib_core::ctx::Ctx;
+use lib_core::model::user::{UserBmc, UserForLogin};
+use lib_core::model::ModelManager;
+use lib_core::pwd::{self, ContentToHash};
 use serde::Deserialize;
 use serde_json::{json, Value};
 use tower_cookies::Cookies;

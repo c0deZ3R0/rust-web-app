@@ -2,25 +2,19 @@
 
 // region:    --- Modules
 
-mod config;
-mod ctx;
 mod error;
 mod log;
-mod model;
-mod pwd;
-mod token;
 mod web;
-// #[cfg(test)] // Commented during early development.
-pub mod _dev_utils;
 
 pub use self::error::{Error, Result};
-pub use config::config;
+pub use lib_core::config::config;
 
-use crate::model::ModelManager;
 use crate::web::mw_auth::{mw_ctx_require, mw_ctx_resolve};
 use crate::web::mw_res_map::mw_reponse_map;
 use crate::web::{routes_login, routes_static, rpc};
 use axum::{middleware, Router};
+use lib_core::_dev_utils;
+use lib_core::model::ModelManager;
 use std::net::SocketAddr;
 use tower_cookies::CookieManagerLayer;
 use tracing::info;

@@ -1,6 +1,6 @@
-use crate::ctx::Ctx;
 use crate::log::log_request;
 use crate::web;
+use crate::web::mw_auth::CtxW;
 use crate::web::rpc::RpcInfo;
 use axum::http::{Method, Uri};
 use axum::response::{IntoResponse, Response};
@@ -10,11 +10,13 @@ use tracing::debug;
 use uuid::Uuid;
 
 pub async fn mw_reponse_map(
-	ctx: Option<Ctx>,
+	ctx: Option<CtxW>,
 	uri: Uri,
 	req_method: Method,
 	res: Response,
 ) -> Response {
+	let ctx = ctx.map(|c| c.0);
+
 	debug!("{:<12} - mw_reponse_map", "RES_MAPPER");
 	let uuid = Uuid::new_v4();
 
