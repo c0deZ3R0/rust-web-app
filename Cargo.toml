@@ -9,9 +9,23 @@ description = "Rust10x rust-web-app production blueprint."
 homepage="https://rust10x.com/web-app"
 repository = "https://github.com/rust10x/rust-web-app"
 
+[workspace]
+members = [
+    # -- Tools
+    # "crates/tools/gen_key",
+
+    # -- Application Libraries
+    "crates/libs/lib-base", # e.g., base64, time.
+    # "crates/libs/core", # e.g., model, ctx, config, pwd, token.
+
+    # -- Application Services
+    # "crates/services/web-server"
+]
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
+# -- App Libs
+lib-base = { path = "crates/libs/lib-base"}
 # -- Json
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
