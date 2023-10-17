@@ -11,6 +11,7 @@ use axum::routing::post;
 use axum::{Json, Router};
 use lib_core::ctx::Ctx;
 use lib_core::model::ModelManager;
+use modql::filter::ListOptions;
 use serde::Deserialize;
 use serde_json::{from_value, json, to_value, Value};
 use tracing::debug;
@@ -43,6 +44,11 @@ pub struct ParamsIded {
 	id: i64,
 }
 
+#[derive(Deserialize)]
+pub struct ParamsList<F> {
+	filter: Option<F>,
+	list_options: Option<ListOptions>,
+}
 // endregion: --- RPC Types
 
 pub fn routes(mm: ModelManager) -> Router {
@@ -78,14 +84,29 @@ pub struct RpcInfo {
 }
 
 macro_rules! exec_rpc_fn {
+	// With optional Params
+	($rpc_fn:expr, $ctx:expr, $mm:expr, $rpc_params:expr, "optional_params") => {{
+		let rpc_fn_name = stringify!($rpc_fn);
+
+		let params = $rpc_params.map(from_value).transpose().map_err(|ex| {
+			Error::RpcFailJsonParams {
+				rpc_method: rpc_fn_name.to_string(),
+				cause: ex.to_string(),
+			}
+		})?;
+
+		$rpc_fn($ctx, $mm, params).await.map(to_value)??
+	}};
+
 	// With Params
 	($rpc_fn:expr, $ctx:expr, $mm:expr, $rpc_params:expr) => {{
 		let rpc_fn_name = stringify!($rpc_fn);
 		let params = $rpc_params.ok_or(Error::RpcMissingParams {
 			rpc_method: rpc_fn_name.to_string(),
 		})?;
-		let params = from_value(params).map_err(|_| Error::RpcFailJsonParams {
+		let params = from_value(params).map_err(|ex| Error::RpcFailJsonParams {
 			rpc_method: rpc_fn_name.to_string(),
+			cause: ex.to_string(),
 		})?;
 		$rpc_fn($ctx, $mm, params).await.map(to_value)??
 	}};
@@ -112,7 +133,9 @@ async fn _rpc_handler(
 	let result_json: Value = match rpc_method.as_str() {
 		// -- Task RPC methods.
 		"create_task" => exec_rpc_fn!(create_task, ctx, mm, rpc_params),
-		"list_tasks" => exec_rpc_fn!(list_tasks, ctx, mm),
+		"list_tasks" => {
+			exec_rpc_fn!(list_tasks, ctx, mm, rpc_params, "optional_params")
+		}
 		"update_task" => exec_rpc_fn!(update_task, ctx, mm, rpc_params),
 		"delete_task" => exec_rpc_fn!(delete_task, ctx, mm, rpc_params),
 
