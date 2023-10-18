@@ -1,11 +1,12 @@
 use crate::ctx::Ctx;
 use crate::model::base::{self, DbBmc};
+use crate::model::modql_utils::time_to_sea_value;
 use crate::model::ModelManager;
 use crate::model::Result;
 use lib_base::time::Rfc3339;
 use modql::field::Fields;
 use modql::filter::{
-	FilterNodes, ListOptions, OpValsBool, OpValsInt64, OpValsString,
+	FilterNodes, ListOptions, OpValsBool, OpValsInt64, OpValsString, OpValsValue,
 };
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
@@ -49,6 +50,13 @@ pub struct TaskFilter {
 	project_id: Option<OpValsInt64>,
 	title: Option<OpValsString>,
 	done: Option<OpValsBool>,
+
+	cid: Option<OpValsInt64>,
+	#[modql(to_sea_value_fn = "time_to_sea_value")]
+	ctime: Option<OpValsValue>,
+	mid: Option<OpValsInt64>,
+	#[modql(to_sea_value_fn = "time_to_sea_value")]
+	mtime: Option<OpValsValue>,
 }
 // endregion: --- Task Types
 
@@ -104,9 +112,12 @@ mod tests {
 	use crate::model::project::ProjectBmc;
 	use crate::model::Error;
 	use anyhow::Result;
+	use lib_base::time::{format_time, now_utc};
 	use modql::filter::OpValString;
 	use serde_json::json;
 	use serial_test::serial;
+	use std::time::Duration;
+	use tokio::time::sleep;
 
 	#[serial]
 	#[tokio::test]
@@ -311,6 +322,49 @@ mod tests {
 		assert_eq!(task.title, fx_title_new);
 
 		// -- Clean
+		ProjectBmc::delete(&ctx, &mm, fx_project_id).await?;
+
+		Ok(())
+	}
+
+	#[serial]
+	#[tokio::test]
+	async fn test_list_by_ctime_ok() -> Result<()> {
+		// -- Setup & Fixtures
+		let mm = _dev_utils::init_test().await;
+		let ctx = Ctx::root_ctx();
+		let fx_project_id = _dev_utils::seed_project(
+			&ctx,
+			&mm,
+			"project for tasks test_list_by_ctime_ok",
+		)
+		.await?;
+		let fx_titles_01 = &[
+			"test_list_by_ctime_ok 01.1",
+			"test_list_by_ctime_ok 01.2",
+			"test_list_by_ctime_ok 01.3",
+		];
+		_dev_utils::seed_tasks(&ctx, &mm, fx_project_id, fx_titles_01).await?;
+
+		let time_marker = format_time(now_utc());
+		sleep(Duration::from_millis(300)).await;
+		let fx_titles_02 =
+			&["test_list_by_ctime_ok 02.1", "test_list_by_ctime_ok 02.2"];
+		_dev_utils::seed_tasks(&ctx, &mm, fx_project_id, fx_titles_02).await?;
+
+		// -- Exec
+		let filter_json = json! ({
+			"ctime": {"$gt": time_marker}, // time in Rfc3339
+		});
+		let filter = serde_json::from_value(filter_json)?;
+		let tasks = TaskBmc::list(&ctx, &mm, Some(filter), None).await?;
+
+		// -- Check
+		let titles: Vec<String> = tasks.into_iter().map(|t| t.title).collect();
+		assert_eq!(titles.len(), 2);
+		assert_eq!(&titles, fx_titles_02);
+
+		// -- Cleanup
 		ProjectBmc::delete(&ctx, &mm, fx_project_id).await?;
 
 		Ok(())

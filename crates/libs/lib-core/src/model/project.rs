@@ -1,11 +1,12 @@
 use crate::ctx::Ctx;
 use crate::model::base::{self, DbBmc};
+use crate::model::modql_utils::time_to_sea_value;
 use crate::model::ModelManager;
 use crate::model::Result;
 use lib_base::time::Rfc3339;
 use modql::field::Fields;
-use modql::filter::ListOptions;
-use modql::filter::{FilterNodes, OpValsString};
+use modql::filter::{FilterNodes, OpValsString, OpValsValue};
+use modql::filter::{ListOptions, OpValsInt64};
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
 use sqlx::types::time::OffsetDateTime;
@@ -58,6 +59,13 @@ struct ProjectForCreateInner {
 #[derive(FilterNodes, Default, Deserialize)]
 pub struct ProjectFilter {
 	name: Option<OpValsString>,
+
+	cid: Option<OpValsInt64>,
+	#[modql(to_sea_value_fn = "time_to_sea_value")]
+	ctime: Option<OpValsValue>,
+	mid: Option<OpValsInt64>,
+	#[modql(to_sea_value_fn = "time_to_sea_value")]
+	mtime: Option<OpValsValue>,
 }
 // endregion: --- Project Types
 
