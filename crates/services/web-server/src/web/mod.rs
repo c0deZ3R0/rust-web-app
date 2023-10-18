@@ -2,6 +2,7 @@
 
 mod error;
 pub mod mw_auth;
+pub mod mw_req_stamp;
 pub mod mw_res_map;
 pub mod routes_login;
 pub mod routes_static;
@@ -10,11 +11,13 @@ pub mod rpc;
 pub use self::error::ClientError;
 pub use self::error::{Error, Result};
 use lib_core::token::generate_web_token;
+use time::OffsetDateTime;
 use tower_cookies::{Cookie, Cookies};
 use uuid::Uuid;
 
 // endregion: --- Modules
 
+// region:    --- Auth Token Utils
 pub const AUTH_TOKEN: &str = "auth-token";
 
 fn set_token_cookie(cookies: &Cookies, user: &str, salt: Uuid) -> Result<()> {
@@ -37,3 +40,16 @@ fn remove_token_cookie(cookies: &Cookies) -> Result<()> {
 
 	Ok(())
 }
+
+// endregion: --- Auth Token Utils
+
+// region:    --- ReqStamp
+
+/// Resolved by mw_req_stamp.
+#[derive(Debug, Clone)]
+pub struct ReqStamp {
+	pub uuid: Uuid,
+	pub time_in: OffsetDateTime,
+}
+
+// endregion: --- ReqStamp

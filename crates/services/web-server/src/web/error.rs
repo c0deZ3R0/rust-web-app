@@ -20,6 +20,9 @@ pub enum Error {
 	LoginFailUserHasNoPwd { user_id: i64 },
 	LoginFail { user_id: i64, cause: pwd::Error },
 
+	// -- ReqStamp
+	ReqStampNotInResponseExt,
+
 	// -- CtxExtError
 	CtxExt(web::mw_auth::CtxExtError),
 
