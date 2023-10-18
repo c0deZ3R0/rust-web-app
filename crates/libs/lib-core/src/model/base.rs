@@ -110,6 +110,8 @@ where
 
 	// -- Execute the query
 	let (sql, values) = query.build_sqlx(PostgresQueryBuilder);
+	println!("->> SQL\n{sql}");
+	println!("->> Values\n{values:?}");
 	let entities = sqlx::query_as_with::<_, E, _>(&sql, values)
 		.fetch_all(db)
 		.await?;
