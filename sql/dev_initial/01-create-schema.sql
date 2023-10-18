@@ -9,7 +9,13 @@ CREATE TABLE "user" (
   -- Auth
   pwd varchar(256),
   pwd_salt uuid NOT NULL DEFAULT gen_random_uuid(),
-  token_salt uuid NOT NULL DEFAULT gen_random_uuid()
+  token_salt uuid NOT NULL DEFAULT gen_random_uuid(),
+
+  -- Timestamps
+  cid bigint NOT NULL,
+  ctime timestamp with time zone NOT NULL,
+  mid bigint NOT NULL,
+  mtime timestamp with time zone NOT NULL  
 );
 
 -- Project
@@ -19,7 +25,13 @@ CREATE TABLE project (
 
   -- Properties
   owner_id BIGINT NOT NULL,
-  name varchar(256) NOT NULL
+  name varchar(256) NOT NULL,
+
+  -- Timestamps
+  cid bigint NOT NULL,
+  ctime timestamp with time zone NOT NULL,
+  mid bigint NOT NULL,
+  mtime timestamp with time zone NOT NULL  
 );
 
 -- Task
@@ -32,7 +44,13 @@ CREATE TABLE task (
   
   -- Properties
   title varchar(256) NOT NULL,
-  done bool NOT NULL DEFAULT false
+  done bool NOT NULL DEFAULT false,
+
+  -- Timestamps
+  cid bigint NOT NULL,
+  ctime timestamp with time zone NOT NULL,
+  mid bigint NOT NULL,
+  mtime timestamp with time zone NOT NULL  
 );
 
 ALTER TABLE task ADD CONSTRAINT fk_project

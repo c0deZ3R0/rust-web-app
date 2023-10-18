@@ -2,11 +2,13 @@ use crate::ctx::Ctx;
 use crate::model::base::{self, DbBmc};
 use crate::model::ModelManager;
 use crate::model::Result;
+use lib_base::time::Rfc3339;
 use modql::field::Fields;
 use modql::filter::ListOptions;
 use modql::filter::{FilterNodes, OpValsString};
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
+use sqlx::types::time::OffsetDateTime;
 use sqlx::FromRow;
 
 // region:    --- Project Types
@@ -14,8 +16,18 @@ use sqlx::FromRow;
 #[derive(Debug, Clone, Fields, FromRow, Serialize)]
 pub struct Project {
 	pub id: i64,
-	pub name: String,
+
 	pub owner_id: i64,
+	pub name: String,
+
+	// -- Timestamps
+	//    (creator and last modified user_id/time)
+	pub cid: i64,
+	#[serde_as(as = "Rfc3339")]
+	pub ctime: OffsetDateTime,
+	pub mid: i64,
+	#[serde_as(as = "Rfc3339")]
+	pub mtime: OffsetDateTime,
 }
 
 #[derive(Deserialize)]
