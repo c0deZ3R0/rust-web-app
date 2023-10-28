@@ -1,4 +1,4 @@
-// #![allow(unused)] // For early development.
+#![allow(unused)] // For early development.
 
 // region:    --- Modules
 
