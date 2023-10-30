@@ -115,7 +115,7 @@ async fn main() -> Result<()> {
 			"logoff": true
 		}),
 	);
-	// req_logoff.await?.print().await?;
+	req_logoff.await?.print().await?;
 
 	Ok(())
 }

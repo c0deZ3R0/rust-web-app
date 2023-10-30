@@ -1,10 +1,37 @@
+//! rpc::router module provides the type and implementation for
+//! json rpc routing.
+//!
+//! It has the following constructs:
+//!
+//! - `RpcRouter` holds the list of `RpcRoute` encapsulated in `dyn RpcRouteTrait` vector.
+//! - `RpcHandler` trait is implemented for any async function that with
+//!   `(Ctx, ModelManager)` or `(Ctx, ModelManager, impl IntoParams)` and that returns
+//!   `web::Result<Serialize>`
+//! - `IntoParams` is the trait to implement to instruct how to go from `Option<Value>` json-rpc params
+//!   to the handler params type.
+//! - `IntoParams` has a default `into_params` implementations that will return an error if the params is missing.
+//!
+//! ```
+//! #[derive(Deserialize)]
+//! pub struct ParamsIded {
+//!   id: i64,
+//! }
+//!
+//! impl IntoParams for ParamsIded {}
+//! ```
+//!
+//! - For custom `IntoParams` behavior, implement the `IntoParams::into_params` function.
+//! - Implementing `IntoDefaultParams` on a type that implements `Default` will auto-implement `IntoParams`
+//!   and call `T::default()` when the params `Option<Value>` is None.
+//!
+
 use crate::web::{Error, Result};
 use futures::Future;
 use lib_core::ctx::Ctx;
 use lib_core::model::ModelManager;
 use serde::de::DeserializeOwned;
-use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde::Serialize;
+use serde_json::Value;
 use std::marker::PhantomData;
 use std::pin::Pin;
 
@@ -77,7 +104,7 @@ macro_rules! rpc_router {
         {
             let mut router = RpcRouter::new();
             $(
-                router = router.add($fn_name.into_boxed_rpc_route(stringify!($fn_name)));
+                router = router.add($fn_name.into_boxed_route(stringify!($fn_name)));
             )+
             router
         }
@@ -97,11 +124,7 @@ pub trait RpcHandler<T, R>: Clone {
 	fn call(self, ctx: Ctx, mm: ModelManager, params: Option<Value>)
 		-> Self::Future;
 
-	fn into_rpc_route(self, name: &'static str) -> RpcRoute<Self, T, R> {
-		RpcRoute::new(self, name)
-	}
-
-	fn into_boxed_rpc_route(self, name: &'static str) -> Box<RpcRoute<Self, T, R>> {
+	fn into_boxed_route(self, name: &'static str) -> Box<RpcRoute<Self, T, R>> {
 		Box::new(RpcRoute::new(self, name))
 	}
 }
@@ -111,8 +134,8 @@ pub trait RpcHandler<T, R>: Clone {
 /// The default implementation below will fail if the value is `None`.
 /// For custom behavior, users can implement their own `into_handler_params`
 /// method.
-pub trait IntoHandlerParams: DeserializeOwned + Send {
-	fn into_handler_params(value: Option<Value>) -> Result<Self> {
+pub trait IntoParams: DeserializeOwned + Send {
+	fn into_params(value: Option<Value>) -> Result<Self> {
 		match value {
 			Some(value) => Ok(serde_json::from_value(value)?),
 			None => Err(Error::RpcIntoParamsMissing),
@@ -121,13 +144,13 @@ pub trait IntoHandlerParams: DeserializeOwned + Send {
 }
 
 /// Marker trait with a blanket implementation that
-pub trait IntoDefaultHandlerParams: DeserializeOwned + Send + Default {}
+pub trait IntoDefaultParams: DeserializeOwned + Send + Default {}
 
-impl<P> IntoHandlerParams for P
+impl<P> IntoParams for P
 where
-	P: IntoDefaultHandlerParams,
+	P: IntoDefaultParams,
 {
-	fn into_handler_params(value: Option<Value>) -> Result<Self> {
+	fn into_params(value: Option<Value>) -> Result<Self> {
 		match value {
 			Some(value) => Ok(serde_json::from_value(value)?),
 			None => Ok(Self::default()),
@@ -147,7 +170,7 @@ where
 		self,
 		ctx: Ctx,
 		mm: ModelManager,
-		params: Option<Value>,
+		_params: Option<Value>,
 	) -> Self::Future {
 		Box::pin(async move {
 			let result = self(ctx, mm).await?;
@@ -158,7 +181,7 @@ where
 
 impl<F, Fut, T, R> RpcHandler<(T,), R> for F
 where
-	T: IntoHandlerParams,
+	T: IntoParams,
 	F: FnOnce(Ctx, ModelManager, T) -> Fut + Clone + Send + 'static,
 	R: Serialize,
 	Fut: Future<Output = Result<R>> + Send,
@@ -175,7 +198,7 @@ where
 			// NOTE: For now, we require the params not to be None
 			//       when the handler takes the params argument.
 			// TODO: Needs to find a way to support Option<T> as handler params.
-			let param = T::into_handler_params(params_value)?;
+			let param = T::into_params(params_value)?;
 
 			let result = self(ctx, mm, param).await?;
 			Ok(serde_json::to_value(result)?)
@@ -242,7 +265,7 @@ where
 	R: Send + Sync,
 {
 	fn is_route_for(&self, method: &str) -> bool {
-		(method == self.name)
+		method == self.name
 	}
 
 	fn call(

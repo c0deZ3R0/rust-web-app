@@ -1,5 +1,5 @@
 use crate::rpc_router;
-use crate::web::rpc::infra::{RpcHandler, RpcRouter};
+use crate::web::rpc::router::{RpcHandler, RpcRouter};
 use crate::web::rpc::{ParamsForCreate, ParamsForUpdate, ParamsIded, ParamsList};
 use crate::web::Result;
 use lib_core::ctx::Ctx;
