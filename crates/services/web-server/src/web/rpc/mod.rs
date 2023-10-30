@@ -6,7 +6,8 @@ mod task_rpc;
 
 use crate::web::mw_auth::CtxW;
 use crate::web::rpc::infra::{
-	IntoHandlerParams, RpcHandler, RpcRouteTrait, RpcRouter,
+	IntoDefaultHandlerParams, IntoHandlerParams, RpcHandler, RpcRouteTrait,
+	RpcRouter,
 };
 use crate::web::rpc::project_rpc::{
 	create_project, delete_project, list_projects, update_project,
@@ -66,17 +67,11 @@ pub struct ParamsList<F> {
 	list_options: Option<ListOptions>,
 }
 
-impl<F> IntoHandlerParams for ParamsList<F>
-where
-	F: DeserializeOwned + Send + Default,
+impl<D> IntoDefaultHandlerParams for ParamsList<D> where
+	D: DeserializeOwned + Send + Default
 {
-	fn into_handler_params(value: Option<Value>) -> Result<Self> {
-		match value {
-			Some(value) => Ok(serde_json::from_value(value)?),
-			None => Ok(Self::default()),
-		}
-	}
 }
+
 // endregion: --- RPC Types
 
 /// RPC basic information containing the id and method for additional logging purposes.
