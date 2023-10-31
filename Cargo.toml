@@ -6,7 +6,6 @@ members = [
 
     # -- Application Libraries
     "crates/libs/lib-base", # e.g., base64, time.
-    # "crates/libs/core", # e.g., model, ctx, config, pwd, token.
     "crates/libs/lib-core", # e.g., model, ctx, config, pwd, token.
 
     # -- Application Services
