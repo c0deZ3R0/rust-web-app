@@ -1,11 +1,14 @@
 // region:    --- Modules
 
 mod params;
-mod project_rpc;
 mod router;
+mod state;
+
+mod project_rpc;
 mod task_rpc;
 
 pub use params::*;
+pub use state::*;
 
 use crate::web::mw_auth::CtxW;
 use crate::web::rpc::router::RpcRouter;
@@ -13,7 +16,6 @@ use axum::extract::State;
 use axum::response::{IntoResponse, Response};
 use axum::routing::post;
 use axum::{Json, Router};
-use lib_core::model::ModelManager;
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::sync::Arc;
@@ -34,32 +36,6 @@ pub struct RpcInfo {
 	pub id: Option<Value>,
 	pub method: String,
 }
-
-// region:    --- RpcState
-
-/// The RpcState for the RPC handler functions.
-///
-/// This becomes useful as the application grows and requires states other than
-/// the ModelManager in the RpcHandlers.
-///
-/// By default, any RPC handler can have `my_rpc_handler(Ctx, RpcState, ...)`.
-///
-/// Implements `From<RpcState>` to allow extracting a sub-state
-/// (e.g., `my_rpc_handler(Ctx, ModelManager, ...)`.
-#[derive(Clone)]
-pub struct RpcState {
-	pub mm: ModelManager,
-}
-
-/// `RpcState -> ModelManager` allowing rpc handler functions
-/// To just have `my_rpc_handler(ctx: Ctx, mm: ModelManager, ..)`
-impl From<RpcState> for ModelManager {
-	fn from(val: RpcState) -> Self {
-		val.mm
-	}
-}
-
-// endregion: --- RpcState
 
 pub fn routes(rpc_state: RpcState) -> Router {
 	// Build the combined RpcRouter.
