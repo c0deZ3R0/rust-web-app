@@ -12,6 +12,7 @@ pub use lib_core::config::config;
 use crate::web::mw_auth::{mw_ctx_require, mw_ctx_resolve};
 use crate::web::mw_req_stamp::mw_req_stamp;
 use crate::web::mw_res_map::mw_reponse_map;
+use crate::web::rpc::RpcState;
 use crate::web::{routes_login, routes_static, rpc};
 use axum::{middleware, Router};
 use lib_core::_dev_utils;
@@ -38,8 +39,9 @@ async fn main() -> Result<()> {
 	let mm = ModelManager::new().await?;
 
 	// -- Define Routes
+	let rpc_state = RpcState { mm: mm.clone() };
 	let routes_rpc =
-		rpc::routes(mm.clone()).route_layer(middleware::from_fn(mw_ctx_require));
+		rpc::routes(rpc_state).route_layer(middleware::from_fn(mw_ctx_require));
 
 	let routes_all = Router::new()
 		.merge(routes_login::routes(mm.clone()))
