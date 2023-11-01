@@ -39,7 +39,7 @@ use std::pin::Pin;
 // region:    --- RpcRouter
 
 pub struct RpcRouter {
-	pub route_by_name: HashMap<&'static str, Box<dyn RpcRouteTrait>>,
+	route_by_name: HashMap<&'static str, Box<dyn RpcRouteTrait>>,
 }
 
 impl RpcRouter {
