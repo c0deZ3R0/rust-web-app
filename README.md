@@ -1,3 +1,13 @@
+# IMPORTANT
+
+This branch is a TEMPORARY preview branch and serves as a preview of the final content that will be merged into the main branch. It won't be merged directly and will ultimately be DELETED once the content is incorporated into the main branch.
+
+The code in the main branch will be reorganized according to the appropriate video episodes.
+
+This is the fourth iteration of the `nx-preview` work, hence the `-04` suffix. The plan is to continue adding to this branch until all the content is reflected in the main branch.
+
+New `nx-preview-...` branches will appear over time with updated content or commit history. The goal is to always have the latest `nx-preview...` branch showcasing the most recent and upcoming changes coming into the blueprint (i.e., main branches & related videos).
+
 # Rust10x Web App Blueprint for Production Coding
 
 More info at: https://rust10x.com/web-app
