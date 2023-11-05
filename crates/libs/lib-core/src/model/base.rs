@@ -3,7 +3,7 @@ use crate::model::ModelManager;
 use crate::model::{Error, Result};
 use lib_base::time::now_utc;
 use modql::field::{Field, Fields, HasFields};
-use modql::filter::{IntoSeaError, ListOptions};
+use modql::filter::{FilterGroups, ListOptions};
 use modql::SIden;
 use sea_query::{
 	Condition, Expr, Iden, IntoIden, PostgresQueryBuilder, Query, TableRef,
@@ -98,7 +98,7 @@ pub async fn list<MC, E, F>(
 ) -> Result<Vec<E>>
 where
 	MC: DbBmc,
-	F: TryInto<Condition, Error = IntoSeaError>,
+	F: Into<FilterGroups>,
 	E: for<'r> FromRow<'r, PgRow> + Unpin + Send,
 	E: HasFields,
 {
@@ -110,7 +110,8 @@ where
 
 	// condition from filter
 	if let Some(filter) = filter {
-		let cond: Condition = filter.try_into()?;
+		let filters: FilterGroups = filter.into();
+		let cond: Condition = filters.try_into()?;
 		query.cond_where(cond);
 	}
 	// list options

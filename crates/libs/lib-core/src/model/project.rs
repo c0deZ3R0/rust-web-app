@@ -58,6 +58,7 @@ struct ProjectForCreateInner {
 
 #[derive(FilterNodes, Default, Deserialize)]
 pub struct ProjectFilter {
+	id: Option<OpValsInt64>,
 	name: Option<OpValsString>,
 
 	cid: Option<OpValsInt64>,
@@ -96,7 +97,7 @@ impl ProjectBmc {
 	pub async fn list(
 		ctx: &Ctx,
 		mm: &ModelManager,
-		filter: Option<ProjectFilter>,
+		filter: Option<Vec<ProjectFilter>>,
 		list_options: Option<ListOptions>,
 	) -> Result<Vec<Project>> {
 		base::list::<Self, _, _>(ctx, mm, filter, list_options).await
