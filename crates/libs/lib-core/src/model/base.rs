@@ -12,6 +12,9 @@ use sea_query_binder::SqlxBinder;
 use sqlx::postgres::PgRow;
 use sqlx::FromRow;
 
+const LIST_LIMIT_DEFAULT: i64 = 1000;
+const LIST_LIMIT_MAX: i64 = 5000;
+
 #[derive(Iden)]
 pub enum CommonIden {
 	Id,
@@ -33,11 +36,32 @@ pub trait DbBmc {
 	}
 }
 
-fn default_list_options() -> ListOptions {
-	ListOptions {
-		limit: Some(1000),
-		offset: None,
-		order_bys: Some("id".into()),
+pub fn compute_list_options(
+	list_options: Option<ListOptions>,
+) -> Result<ListOptions> {
+	if let Some(mut list_options) = list_options {
+		// Validate the limit.
+		if let Some(limit) = list_options.limit {
+			if limit > LIST_LIMIT_MAX {
+				return Err(Error::ListLimitOverMax {
+					max: LIST_LIMIT_MAX,
+					actual: limit,
+				});
+			}
+		}
+		// Set the default limit if no limit
+		else {
+			list_options.limit = Some(LIST_LIMIT_DEFAULT);
+		}
+		Ok(list_options)
+	}
+	// When None, return default
+	else {
+		Ok(ListOptions {
+			limit: Some(LIST_LIMIT_DEFAULT),
+			offset: None,
+			order_bys: Some("id".into()),
+		})
 	}
 }
 
@@ -123,7 +147,7 @@ where
 		query.cond_where(cond);
 	}
 	// list options
-	let list_options = list_options.unwrap_or_else(default_list_options);
+	let list_options = compute_list_options(list_options)?;
 	list_options.apply_to_sea_query(&mut query);
 
 	// -- Execute the query
