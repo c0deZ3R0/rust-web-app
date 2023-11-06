@@ -33,6 +33,14 @@ pub trait DbBmc {
 	}
 }
 
+fn default_list_options() -> ListOptions {
+	ListOptions {
+		limit: Some(1000),
+		offset: None,
+		order_bys: Some("id".into()),
+	}
+}
+
 pub async fn create<MC, E>(ctx: &Ctx, mm: &ModelManager, data: E) -> Result<i64>
 where
 	MC: DbBmc,
@@ -115,9 +123,8 @@ where
 		query.cond_where(cond);
 	}
 	// list options
-	if let Some(list_options) = list_options {
-		list_options.apply_to_sea_query(&mut query);
-	}
+	let list_options = list_options.unwrap_or_else(default_list_options);
+	list_options.apply_to_sea_query(&mut query);
 
 	// -- Execute the query
 	let (sql, values) = query.build_sqlx(PostgresQueryBuilder);
