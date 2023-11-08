@@ -103,18 +103,21 @@ async fn main() -> Result<()> {
 			"id": 1,
 			"method": "list_tasks",
 			"params": {
-				"filters": [{
+				"filters": [
+				{
 					"project_id": project_id,
 					"title": {"$contains": "BB"},
-				}, {
-					// just to show how to use other number operators
+				},
+				// Shows how to use other $in
+				{
+
 					"project_id": { "$in": [project_id] },
-					"title": {"$endsWith": "AAA 4"}
+					"title": {"$in": ["task AAA 3", "task AAA 4"]}
 				},
 				// This won't match any projects, so, won't return anything.
 				{
-					"project_id": { "$in": [123, 124]},
-					"title": {"$endsWith": "AAA 3"}
+					"project_id": { "$in": [ 123, 124]},
+					"title": {"$in": ["task AAA 2", "task AAA 5"]}
 				}
 				]
 			}
