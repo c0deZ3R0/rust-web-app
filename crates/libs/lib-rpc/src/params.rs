@@ -7,7 +7,8 @@
 //! `IntoParams` or `IntoDefaultParams` are implemented to ensure these Params conform to the
 //! `RpcRouter` (i.e., `rpc::router`) model.
 
-use crate::web::rpc::router::{IntoDefaultParams, IntoParams};
+use crate::router::{IntoDefaultParams, IntoParams};
+use crate::Result;
 use modql::filter::ListOptions;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
@@ -66,7 +67,7 @@ where
 	D: DeserializeOwned + Send,
 	D: IntoParams,
 {
-	fn into_params(value: Option<Value>) -> crate::web::Result<Self> {
+	fn into_params(value: Option<Value>) -> Result<Self> {
 		let value = value.map(|v| serde_json::from_value(v)).transpose()?;
 		Ok(value)
 	}

@@ -1,7 +1,7 @@
+use crate::router::RpcRouter;
 use crate::rpc_router;
-use crate::web::rpc::router::{RpcHandler, RpcRouter};
-use crate::web::rpc::{ParamsForCreate, ParamsForUpdate, ParamsIded, ParamsList};
-use crate::web::Result;
+use crate::Result;
+use crate::{ParamsForCreate, ParamsForUpdate, ParamsIded, ParamsList};
 use lib_core::ctx::Ctx;
 use lib_core::model::project::{
 	Project, ProjectBmc, ProjectFilter, ProjectForCreate, ProjectForUpdate,
@@ -10,6 +10,7 @@ use lib_core::model::ModelManager;
 
 pub fn rpc_router() -> RpcRouter {
 	rpc_router!(
+		// Same as
 		create_project,
 		list_projects,
 		update_project,

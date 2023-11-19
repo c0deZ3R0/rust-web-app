@@ -1,6 +1,6 @@
 use crate::log::log_request;
 use crate::web::mw_auth::CtxW;
-use crate::web::rpc::RpcInfo;
+use crate::web::routes_rpc::RpcInfo;
 use crate::web::{self, ReqStamp};
 use axum::http::{Method, Uri};
 use axum::response::{IntoResponse, Response};

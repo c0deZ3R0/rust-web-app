@@ -1,3 +1,7 @@
+[workspace.lints.rust]
+unsafe_code = "forbid"
+# unused = "allow" # For experimental dev
+
 [workspace]
 resolver = "2"
 members = [
@@ -6,6 +10,7 @@ members = [
 
     # -- Application Libraries
     "crates/libs/lib-base", # e.g., base64, time.
+    "crates/libs/lib-rpc", # e.g., rpc routing.
     "crates/libs/lib-core", # e.g., model, ctx, config, pwd, token.
 
     # -- Application Services

@@ -31,7 +31,7 @@ pub struct Project {
 	pub mtime: OffsetDateTime,
 }
 
-#[derive(Deserialize)]
+#[derive(Fields, Deserialize)]
 pub struct ProjectForCreate {
 	pub name: String,
 }

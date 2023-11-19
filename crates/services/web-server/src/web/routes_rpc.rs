@@ -1,42 +1,32 @@
-// region:    --- Modules
-
-mod params;
-mod router;
-mod state;
-
-mod project_rpc;
-mod task_rpc;
-
-pub use params::*;
-pub use state::*;
-
 use crate::web::mw_auth::CtxW;
-use crate::web::rpc::router::RpcRouter;
 use axum::extract::State;
 use axum::response::{IntoResponse, Response};
 use axum::routing::post;
 use axum::{Json, Router};
-use serde::Deserialize;
+use lib_core::model::ModelManager;
+use lib_rpc::router::RpcRouter;
+use lib_rpc::{project_rpc, task_rpc, RpcRequest, RpcResources};
 use serde_json::{json, Value};
 use std::sync::Arc;
 
-// endregion: --- Modules
-
-/// The raw JSON-RPC request object, serving as the foundation for RPC routing.
-#[derive(Deserialize)]
-struct RpcRequest {
-	id: Option<Value>,
-	method: String,
-	params: Option<Value>,
+/// The RpcState is the Axum State that will
+/// be used for the Axum RPC router handler.
+///
+/// Note: Not to be confused with the RpcResources that will be used
+///       for the RpcRouter system, and might contain some of the elements
+///       of this Rpc State.
+#[derive(Clone)]
+pub struct RpcState {
+	pub mm: ModelManager,
 }
 
-/// RPC basic information containing the id and method for additional logging purposes.
 #[derive(Debug)]
 pub struct RpcInfo {
 	pub id: Option<Value>,
 	pub method: String,
 }
 
+// Axum router for '/api/rpc'
 pub fn routes(rpc_state: RpcState) -> Router {
 	// Build the combined RpcRouter.
 	let rpc_router = RpcRouter::new()
@@ -62,11 +52,15 @@ async fn rpc_axum_handler(
 		id: rpc_req.id.clone(),
 		method: rpc_req.method.clone(),
 	};
+	let rpc_method = &rpc_info.method;
+	let rpc_params = rpc_req.params;
+	let rpc_resources = RpcResources {
+		ctx: Some(ctx),
+		mm: rpc_state.mm,
+	};
 
 	// -- Exec Rpc Route
-	let res = rpc_router
-		.call(&rpc_info.method, ctx, rpc_state, rpc_req.params)
-		.await;
+	let res = rpc_router.call(rpc_method, rpc_params, rpc_resources).await;
 
 	// -- Build Rpc Success Response
 	let res = res.map(|v| {
@@ -78,6 +72,7 @@ async fn rpc_axum_handler(
 	});
 
 	// -- Create and Update Axum Response
+	let res: crate::web::Result<_> = res.map_err(crate::web::Error::from);
 	let mut res = res.into_response();
 	res.extensions_mut().insert(rpc_info);
 

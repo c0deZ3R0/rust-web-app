@@ -13,10 +13,6 @@ pub type Result<T> = core::result::Result<T, Error>;
 #[derive(Debug, Serialize, strum_macros::AsRefStr, From)]
 #[serde(tag = "type", content = "data")]
 pub enum Error {
-	// -- RPC
-	RpcMethodUnknown(String),
-	RpcIntoParamsMissing,
-
 	// -- Login
 	LoginFailUsernameNotFound,
 	LoginFailUserHasNoPwd {
@@ -35,6 +31,8 @@ pub enum Error {
 	CtxExt(web::mw_auth::CtxExtError),
 
 	// -- Modules
+	#[from]
+	Rpc(lib_rpc::Error),
 	#[from]
 	Model(model::Error),
 	#[from]

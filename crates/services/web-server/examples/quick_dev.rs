@@ -1,4 +1,4 @@
-#![allow(unused)] // For beginning only.
+#![allow(unused)] // For example code.
 
 use anyhow::Result;
 use serde_json::json;
