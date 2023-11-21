@@ -1,4 +1,4 @@
-use crate::config;
+use crate::web_config;
 use axum::handler::HandlerWithoutStateExt;
 use axum::http::StatusCode;
 use axum::routing::{any_service, MethodRouter};
@@ -12,7 +12,7 @@ pub fn serve_dir() -> MethodRouter {
 	}
 
 	any_service(
-		ServeDir::new(&config().WEB_FOLDER)
+		ServeDir::new(&web_config().WEB_FOLDER)
 			.not_found_service(handle_404.into_service()),
 	)
 }

@@ -4,7 +4,7 @@ mod error;
 
 pub use self::error::{Error, Result};
 
-use crate::config;
+use crate::auth_config;
 use hmac::{Hmac, Mac};
 use lib_base::b64::{b64u_decode_to_string, b64u_encode};
 use lib_base::time::{now_utc, now_utc_plus_sec_str, parse_utc};
@@ -65,12 +65,12 @@ impl Display for Token {
 // region:    --- Web Token Gen and Validation
 
 pub fn generate_web_token(user: &str, salt: Uuid) -> Result<Token> {
-	let config = &config();
+	let config = &auth_config();
 	_generate_token(user, config.TOKEN_DURATION_SEC, salt, &config.TOKEN_KEY)
 }
 
 pub fn validate_web_token(origin_token: &Token, salt: Uuid) -> Result<()> {
-	let config = &config();
+	let config = &auth_config();
 	_validate_token_sign_and_exp(origin_token, salt, &config.TOKEN_KEY)?;
 
 	Ok(())
@@ -204,7 +204,7 @@ mod tests {
 		let fx_salt =
 			Uuid::parse_str("f05e8961-d6ad-4086-9e78-a6de065e5453").unwrap();
 		let fx_duration_sec = 0.02; // 20ms
-		let token_key = &config().TOKEN_KEY;
+		let token_key = &auth_config().TOKEN_KEY;
 		let fx_token =
 			_generate_token(fx_user, fx_duration_sec, fx_salt, token_key)?;
 
@@ -225,7 +225,7 @@ mod tests {
 		let fx_salt =
 			Uuid::parse_str("f05e8961-d6ad-4086-9e78-a6de065e5453").unwrap();
 		let fx_duration_sec = 0.01; // 10ms
-		let token_key = &config().TOKEN_KEY;
+		let token_key = &auth_config().TOKEN_KEY;
 		let fx_token =
 			_generate_token(fx_user, fx_duration_sec, fx_salt, token_key)?;
 

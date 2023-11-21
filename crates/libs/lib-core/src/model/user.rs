@@ -2,7 +2,7 @@ use crate::ctx::Ctx;
 use crate::model::base::{self, add_timestamps_for_update, DbBmc};
 use crate::model::ModelManager;
 use crate::model::Result;
-use crate::pwd::{self, ContentToHash};
+use lib_auth::pwd::{self, ContentToHash};
 use modql::field::{Field, Fields, HasFields};
 use sea_query::{Expr, Iden, PostgresQueryBuilder, Query};
 use sea_query_binder::SqlxBinder;

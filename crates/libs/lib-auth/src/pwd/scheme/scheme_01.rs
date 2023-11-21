@@ -1,5 +1,5 @@
 use super::{Error, Result};
-use crate::config;
+use crate::auth_config;
 use crate::pwd::scheme::Scheme;
 use crate::pwd::ContentToHash;
 use hmac::{Hmac, Mac};
@@ -10,7 +10,7 @@ pub struct Scheme01;
 
 impl Scheme for Scheme01 {
 	fn hash(&self, to_hash: &ContentToHash) -> Result<String> {
-		let key = &config().PWD_KEY;
+		let key = &auth_config().PWD_KEY;
 		hash(key, to_hash)
 	}
 
@@ -48,7 +48,7 @@ fn hash(key: &[u8], to_hash: &ContentToHash) -> Result<String> {
 #[cfg(test)]
 mod tests {
 	use super::*;
-	use crate::config;
+	use crate::auth_config;
 	use anyhow::Result;
 	use uuid::Uuid;
 
@@ -56,7 +56,7 @@ mod tests {
 	fn test_scheme_01_hash_into_b64u_ok() -> Result<()> {
 		// -- Setup & Fixtures
 		let fx_salt = Uuid::parse_str("f05e8961-d6ad-4086-9e78-a6de065e5453")?;
-		let fx_key = &config().PWD_KEY; // 512 bits = 64 bytes
+		let fx_key = &auth_config().PWD_KEY; // 512 bits = 64 bytes
 		let fx_to_hash = ContentToHash {
 			content: "hello world".to_string(),
 			salt: fx_salt,

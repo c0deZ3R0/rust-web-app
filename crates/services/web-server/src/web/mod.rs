@@ -10,7 +10,7 @@ pub mod routes_static;
 
 pub use self::error::ClientError;
 pub use self::error::{Error, Result};
-use lib_core::token::generate_web_token;
+use lib_auth::token::generate_web_token;
 use time::OffsetDateTime;
 use tower_cookies::{Cookie, Cookies};
 use uuid::Uuid;

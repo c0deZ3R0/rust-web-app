@@ -12,6 +12,7 @@ workspace = true
 [dependencies]
 # -- App Libs
 lib-base = { path = "../../libs/lib-base"}
+lib-auth = { path = "../../libs/lib-auth"}
 # -- Async
 tokio = { version = "1", features = ["full"] }
 async-trait = "0.1"
@@ -32,11 +33,6 @@ modql = {version = "0.3.4", features = ["with-sea-query"]}
 # -- Tracing
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-# -- Hashing (pwd-scheme01 & Token)
-hmac = "0.12"
-sha2 = "0.10"
-# -- Hashing (pwd-scheme02)
-argon2 = {version="0.5", features=["std"]}
 # -- Others
 uuid = {version = "1", features = ["v4","fast-rng",]}
 time = {version = "0.3", features = ["formatting", "parsing", "serde"]}

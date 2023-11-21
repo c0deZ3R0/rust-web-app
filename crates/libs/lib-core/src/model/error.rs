@@ -1,6 +1,6 @@
 use crate::model::store;
-use crate::pwd;
 use derive_more::From;
+use lib_auth::pwd;
 use serde::Serialize;
 use serde_with::{serde_as, DisplayFromStr};
 

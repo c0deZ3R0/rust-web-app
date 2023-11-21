@@ -11,7 +11,8 @@ members = [
     # -- Application Libraries
     "crates/libs/lib-base", # e.g., base64, time.
     "crates/libs/lib-rpc", # e.g., rpc routing.
-    "crates/libs/lib-core", # e.g., model, ctx, config, pwd, token.
+    "crates/libs/lib-auth", # e.g., for pwd, token.
+    "crates/libs/lib-core", # e.g., model, ctx, config.
 
     # -- Application Services
     "crates/services/web-server"

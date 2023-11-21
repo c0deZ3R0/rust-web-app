@@ -1,11 +1,12 @@
 // region:    --- Modules
 
+mod config;
 mod error;
 mod log;
 mod web;
 
 pub use self::error::{Error, Result};
-pub use lib_core::config::config;
+pub use config::web_config;
 
 use crate::web::mw_auth::{mw_ctx_require, mw_ctx_resolve};
 use crate::web::mw_req_stamp::mw_req_stamp;

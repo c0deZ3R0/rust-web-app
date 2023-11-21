@@ -6,8 +6,9 @@ edition = "2021"
 [dependencies]
 # -- App Libs
 lib-base = { path = "../../libs/lib-base"}
-lib-core = { path = "../../libs/lib-core"}
 lib-rpc = { path = "../../libs/lib-rpc"}
+lib-auth = { path = "../../libs/lib-auth"}
+lib-core = { path = "../../libs/lib-core"}
 # -- Async
 tokio = { version = "1", features = ["full"] }
 futures = "0.3"
@@ -34,7 +35,6 @@ uuid = {version = "1", features = ["v4","fast-rng",]}
 time = "0.3"
 strum_macros = "0.25"
 derive_more = {version = "1.0.0-beta", features = ["from"] }
-
 
 
 
