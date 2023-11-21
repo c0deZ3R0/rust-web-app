@@ -3,6 +3,9 @@ name = "lib-rpc"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+doctest = false
+
 [lints]
 workspace = true
 

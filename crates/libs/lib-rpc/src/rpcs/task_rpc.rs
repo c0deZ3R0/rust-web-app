@@ -14,7 +14,7 @@ pub fn rpc_router() -> RpcRouter {
 		create_task,
 		list_tasks,
 		update_task,
-		delete_task
+		delete_task,
 	)
 }
 
