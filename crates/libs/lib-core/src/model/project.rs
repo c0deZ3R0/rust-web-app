@@ -3,7 +3,7 @@ use crate::model::base::{self, DbBmc};
 use crate::model::modql_utils::time_to_sea_value;
 use crate::model::ModelManager;
 use crate::model::Result;
-use lib_base::time::Rfc3339;
+use lib_utils::time::Rfc3339;
 use modql::field::Fields;
 use modql::filter::{FilterNodes, OpValsString, OpValsValue};
 use modql::filter::{ListOptions, OpValsInt64};

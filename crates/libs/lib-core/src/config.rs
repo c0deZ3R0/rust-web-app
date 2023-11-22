@@ -1,4 +1,4 @@
-use lib_base::envs::get_env;
+use lib_utils::envs::get_env;
 use std::sync::OnceLock;
 
 pub fn core_config() -> &'static CoreConfig {
@@ -21,7 +21,7 @@ pub struct CoreConfig {
 }
 
 impl CoreConfig {
-	fn load_from_env() -> lib_base::envs::Result<CoreConfig> {
+	fn load_from_env() -> lib_utils::envs::Result<CoreConfig> {
 		Ok(CoreConfig {
 			// -- Db
 			DB_URL: get_env("SERVICE_DB_URL")?,

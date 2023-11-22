@@ -3,7 +3,7 @@ use crate::model::base::{self, DbBmc};
 use crate::model::modql_utils::time_to_sea_value;
 use crate::model::ModelManager;
 use crate::model::Result;
-use lib_base::time::Rfc3339;
+use lib_utils::time::Rfc3339;
 use modql::field::Fields;
 use modql::filter::{
 	FilterNodes, ListOptions, OpValsBool, OpValsInt64, OpValsString, OpValsValue,
@@ -113,7 +113,7 @@ mod tests {
 	use crate::model::project::ProjectBmc;
 	use crate::model::Error;
 	use anyhow::Result;
-	use lib_base::time::{format_time, now_utc};
+	use lib_utils::time::{format_time, now_utc};
 	use modql::filter::OpValString;
 	use serde_json::json;
 	use serial_test::serial;

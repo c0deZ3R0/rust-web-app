@@ -1,4 +1,4 @@
-use lib_base::envs::get_env;
+use lib_utils::envs::get_env;
 use std::sync::OnceLock;
 
 pub fn web_config() -> &'static WebConfig {
@@ -17,7 +17,7 @@ pub struct WebConfig {
 }
 
 impl WebConfig {
-	fn load_from_env() -> lib_base::envs::Result<WebConfig> {
+	fn load_from_env() -> lib_utils::envs::Result<WebConfig> {
 		Ok(WebConfig {
 			WEB_FOLDER: get_env("SERVICE_WEB_FOLDER")?,
 		})

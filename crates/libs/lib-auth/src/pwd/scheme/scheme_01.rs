@@ -3,7 +3,7 @@ use crate::auth_config;
 use crate::pwd::scheme::Scheme;
 use crate::pwd::ContentToHash;
 use hmac::{Hmac, Mac};
-use lib_base::b64::b64u_encode;
+use lib_utils::b64::b64u_encode;
 use sha2::Sha512;
 
 pub struct Scheme01;
